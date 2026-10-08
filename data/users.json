@@ -1,0 +1,25 @@
+{
+  "users": [
+    {
+      "id": "ronja",
+      "username": "ronja",
+      "password": "1234",
+      "displayName": "Ronja",
+      "avatar": "manga-1"
+    },
+    {
+      "id": "ben",
+      "username": "ben",
+      "password": "1234",
+      "displayName": "Ben",
+      "avatar": "manga-2"
+    },
+    {
+      "id": "leo",
+      "username": "leo",
+      "password": "super",
+      "displayName": "Leo",
+      "avatar": "manga-3"
+    }
+  ]
+}

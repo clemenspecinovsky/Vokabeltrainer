@@ -1,0 +1,406 @@
+[
+  [
+    "eins",
+    "one"
+  ],
+  [
+    "zwei",
+    "two"
+  ],
+  [
+    "drei",
+    "three"
+  ],
+  [
+    "vier",
+    "four"
+  ],
+  [
+    "fünf",
+    "five"
+  ],
+  [
+    "sechs",
+    "six"
+  ],
+  [
+    "sieben",
+    "seven"
+  ],
+  [
+    "acht",
+    "eight"
+  ],
+  [
+    "neun",
+    "nine"
+  ],
+  [
+    "zehn",
+    "ten"
+  ],
+  [
+    "elf",
+    "eleven"
+  ],  
+  [
+    "zwölf",
+    "twelve"
+  ],  
+  [
+    "dreizehn",
+    "thirteen"
+  ],
+  [
+    "vierzehn",
+    "fourteen"
+  ],
+  [
+    "fünfzehn",
+    "fifteen"
+  ],
+  [
+    "sechzehn",
+    "sixteen"
+  ],
+  [
+    "siebzehn",
+    "seventeen"
+  ],
+  [
+    "achtzehn",
+    "eighteen"
+  ],
+  [
+    "neunzehn",
+    "nineteen"
+  ],
+  [
+    "zwanzig",
+    "twenty"
+  ],
+  [
+    "einundzwanzig",
+    "twenty-one"
+  ],
+  [
+    "zweiundzwanzig",
+    "twenty-two"
+  ],
+  [
+    "dreiundzwanzig",
+    "twenty-three"
+  ],
+  [
+    "vierundzwanzig",
+    "twenty-four"
+  ],
+  [
+    "fünfundzwanzig",
+    "twenty-five"
+  ],
+  [
+    "rot",
+    "red"
+  ],
+  [
+    "gelb",
+    "yellow"
+  ],
+  [
+    "blau",
+    "blue"
+  ],
+  [
+    "grün",
+    "green"
+  ],
+  [
+    "orange",
+    "orange"
+  ],
+  [
+    "braun",
+    "brown"
+  ],
+  [
+    "rosa",
+    "pink"
+  ],
+  [
+    "weiß",
+    "white"
+  ],
+  [
+    "schwarz",
+    "black"
+  ],
+  [
+    "grau",
+    "grey"
+  ],
+  [
+    "Bild",
+    "picture"
+  ],
+  [
+    "sich (hin-)setzen",
+    "to sit down"
+  ],
+  [
+    "sprechen",
+    "to speak"
+  ],
+  [
+    "aufstehen",
+    "to stand up"
+  ],
+  [
+    "herausnehmen",
+    "to take out"
+  ],
+  [
+    "(Schul-) Klasse",
+    "class"
+  ],
+  [
+    "Nehmt eure Bücher heraus.",
+    "Take out your books."
+  ],
+  [
+    "öffnen, aufmachen",
+    "to open"
+  ],
+  [
+    "schließen, zumachen",
+    "to close"
+  ],
+  [
+    "sauber machen, putzen",
+    "to clean"
+  ],
+  [
+    "Das Kind ist in der Klasse 1A.",
+    "The child is in class 1A."
+  ],
+  [
+    "Meine Lieblingsfarbe ist Hellblau.",
+    "My favourite colour is light blue."
+  ],
+  [
+    "Kind",
+    "child"
+  ],
+  [
+    "hell, Licht, Straßenlicht",
+    "light, street light"
+  ],
+  [
+    "finden",
+    "to find"
+  ],
+  [
+    "lieblings-",
+    "favourite"
+  ],
+  [
+    "Das ist unsere Schule.",
+    "This is our school."
+  ],
+  [
+    "unser/e",
+    "our"
+  ],
+  [
+    "Mitternacht",
+    "midnight"
+  ],
+  [
+    "dass",
+    "that"
+  ],
+  [
+    "es",
+    "it"
+  ],
+  [
+    "hier",
+    "here"
+  ],
+  [
+    "hassen, nicht aussehen können",
+    "to hate, can't stand"
+  ],
+  [
+    "wie viele",
+    "how many"
+  ],
+  [
+    "müssen",
+    "must"
+  ],
+  [
+    "gehen",
+    "to go"
+  ],
+  [
+    "essen, fressen",
+    "to eat"
+  ],
+  [
+    "oder",
+    "or"
+  ],
+  [
+    "sehen, schauen, schau mal",
+    "to look"
+  ],
+  [
+    "Wie lautet deine E-Mail-Adresse?",
+    "What's your email address?"
+  ],
+  [
+    "dein/e, ihr/e, euer/eure",
+    "your"
+  ],
+  [
+    "dann, danach",
+    "then"
+  ],
+  [
+    "Schön dich kennenzulernen",
+    "Nice to meet you!"
+  ],
+  [
+    "kennenlernen, sich treffen",
+    "to meet"
+  ],
+  [
+    "Höre das Lied an",
+    "Listen to the song"
+  ],
+  [
+    "zuhören",
+    "to listen"
+  ],
+  [
+    "genießen",
+    "to enjoy"
+  ],
+  [
+    "Schreibe die Zahlen",
+    "Write the numbers"
+  ],
+  [
+    "schreiben",
+    "to write"
+  ],
+  [
+    "verstehen",
+    "to understand"
+  ],
+  [
+    "Zeit",
+    "time"
+  ],
+  [
+    "geben",
+    "to give"
+  ],
+  [
+    "Schuh",
+    "shoe"
+  ],
+  [
+    "Socken",
+    "socks"
+  ],
+  [
+    "Rock",
+    "skirt"
+  ],
+  [
+    "Pullover",
+    "sweater"
+  ],
+  [
+    "Hemd",
+    "shirt"
+  ],
+  [
+    "Schulkrawatte",
+    "school tie"
+  ],
+  [
+    "Hut",
+    "hat"
+  ],
+  [
+    "Sonnenbrille",
+    "sunglasses"
+  ],
+  [
+    "Haarklammer",
+    "hairband"
+  ],
+  [
+    "Bleistift",
+    "pencil"
+  ],
+  [
+    "Schultasche",
+    "school bag"
+  ],
+  [
+    "Sessel",
+    "chair"
+  ],
+  [
+    "Federmäppchen",
+    "pencil case"
+  ],
+  [
+    "Pinsel",
+    "paintbrush"
+  ],
+  [
+    "Wasserfarben",
+    "watercolours"
+  ],
+  [
+    "Tafel",
+    "board"
+  ],
+  [
+    "Boden",
+    "floor"
+  ],
+  [
+    "Lineal",
+    "ruler"
+  ],
+  [
+    "Schere",
+    "scissors"
+  ],
+  [
+    "Türe",
+    "door"
+  ],
+  [
+    "Schreibtisch",
+    "desk"
+  ],
+  [
+    "Fenster",
+    "window"
+  ],
+  [
+    "Beamer",
+    "projector"
+  ],
+  [
+    "Tonanlage",
+    "sound system"
+  ]
+]
