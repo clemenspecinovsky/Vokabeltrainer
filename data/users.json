@@ -8,17 +8,17 @@
       "avatar": "manga-1"
     },
     {
-      "id": "ben",
-      "username": "ben",
+      "id": "kathi",
+      "username": "kathi",
       "password": "1234",
-      "displayName": "Ben",
+      "displayName": "Kathi",
       "avatar": "manga-2"
     },
     {
-      "id": "leo",
-      "username": "leo",
+      "id": "peci",
+      "username": "peci",
       "password": "super",
-      "displayName": "Leo",
+      "displayName": "Peci",
       "avatar": "manga-3"
     }
   ]

@@ -269,7 +269,7 @@ export default function TestScreen({ name, words }: TestScreenProps) {
         window.clearTimeout(timerRef.current);
         timerRef.current = null;
       }
-      timerRef.current = window.setTimeout(advance, ok ? 1900 : 4600);
+      if (ok) timerRef.current = window.setTimeout(advance, 1900);
     },
     [current, feedback, mastered, queue, retried, scheduleReask, advance, clearTimer, stopListening],
   );
