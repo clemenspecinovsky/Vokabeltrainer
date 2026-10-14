@@ -8,9 +8,10 @@ interface TopBarProps {
   children?: ReactNode;
   showMenu?: boolean;
   showLogout?: boolean;
+  showSettings?: boolean;
 }
 
-export default function TopBar({ children, showMenu = true, showLogout = true }: TopBarProps) {
+export default function TopBar({ children, showMenu = true, showLogout = true, showSettings = true }: TopBarProps) {
   const router = useRouter();
 
   async function logout() {
@@ -29,13 +30,23 @@ export default function TopBar({ children, showMenu = true, showLogout = true }:
         <span />
       )}
       <div className="row">{children}</div>
-      {showLogout ? (
-        <ComicButton tone="red" size="sm" icon="✕" onClick={logout}>
-          AUS
-        </ComicButton>
-      ) : (
-        <span />
-      )}
+      <div className="row">
+        {showSettings ? (
+          <ComicButton
+            tone="purple"
+            size="sm"
+            icon="⚙"
+            onClick={() => router.push("/settings")}
+            aria-label="Einstellungen"
+            title="Einstellungen"
+          />
+        ) : null}
+        {showLogout ? (
+          <ComicButton tone="red" size="sm" icon="✕" onClick={logout}>
+            AUS
+          </ComicButton>
+        ) : null}
+      </div>
     </header>
   );
 }

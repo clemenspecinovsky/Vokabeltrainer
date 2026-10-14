@@ -546,7 +546,7 @@ export default function TestScreen({ name, words }: TestScreenProps) {
   const question = current;
 
   return (
-    <main className="page">
+    <main className="page page--quiz">
       <div className="container" style={{ maxWidth: 860 }}>
         <TopBar>
           <span className="chip chip--info">👤 {name}</span>
@@ -646,7 +646,7 @@ export default function TestScreen({ name, words }: TestScreenProps) {
           </section>
         ) : null}
 
-        <p className="hint">Enter prüft · falsche Wörter kommen nach einer zufälligen Pause wieder.</p>
+        <p className="hint quiz-footer-hint">Enter prüft · falsche Wörter kommen nach einer zufälligen Pause wieder.</p>
         <VoiceHint />
       </div>
 

@@ -17,12 +17,13 @@ const body = Baloo_2({
 
 export const metadata: Metadata = {
   title: "Vokabel-Trainer",
-  description: "Manga Vokabel-Trainer für Kinder: lernen und testen auf Deutsch und Englisch.",
+  description: "Comic Vokabel-Trainer für Kinder: lernen und testen auf Deutsch und Englisch.",
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
   themeColor: "#ffd23f",
 };
 

@@ -12,9 +12,12 @@ export type SingleDirection = "de2en" | "en2de";
 export interface StoredUser {
   id: string;
   username: string;
-  password: string;
+  password?: string;
+  passwordHash?: string;
   displayName: string;
   avatar?: string;
+  avatarImage?: string;
+  avatarMode?: "preset" | "photo";
 }
 
 export interface SessionData {

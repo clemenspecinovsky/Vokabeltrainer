@@ -44,7 +44,7 @@ export default function LoginPage() {
     <main className="page">
       <div className="container" style={{ maxWidth: 640 }}>
         <h1 className="display title ink-outline">VOKABEL-TRAINER</h1>
-        <p className="subtitle">Manga Edition – lernen, üben, stolpern, gewinnen!</p>
+        <p className="subtitle">Comic Edition – lernen, üben, stolpern, gewinnen!</p>
 
         <div className="panel panel--dots pop-in">
           <div className="stack">

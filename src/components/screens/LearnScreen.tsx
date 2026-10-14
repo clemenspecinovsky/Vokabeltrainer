@@ -68,7 +68,13 @@ export default function LearnScreen({ name, words }: LearnScreenProps) {
           <span className="chip">Wort {index + 1} / {total}</span>
         </TopBar>
 
-        <Progress value={index + 1} max={total} label={`${Math.round(((index + 1) / total) * 100)} %`} />
+        <Progress
+          value={index + 1}
+          max={total}
+          label={`${Math.round(((index + 1) / total) * 100)} %`}
+          ariaLabel="Wortfortschritt"
+          onSeek={(value) => setIndex(value - 1)}
+        />
 
         <section key={index} className="panel card-enter" aria-live="polite">
           <div className="stack">
@@ -123,7 +129,7 @@ export default function LearnScreen({ name, words }: LearnScreenProps) {
           </ComicButton>
         </nav>
 
-        <p className="hint">Tipp: mit den Pfeiltasten ← → blättern, ESC beendet.</p>
+        <p className="hint">Tipp: Balken oben anklicken oder ziehen, mit ← → blättern, ESC beendet.</p>
         <VoiceHint />
       </div>
 

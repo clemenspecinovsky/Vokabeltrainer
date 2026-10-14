@@ -1,0 +1,13 @@
+node_modules
+.next
+out
+coverage
+certs
+.venv
+Unittests
+*.tsbuildinfo
+Dockerfile
+.dockerignore
+.git
+.gitignore
+README.md

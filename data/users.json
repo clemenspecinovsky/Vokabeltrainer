@@ -3,23 +3,27 @@
     {
       "id": "ronja",
       "username": "ronja",
-      "password": "1234",
       "displayName": "Ronja",
-      "avatar": "manga-1"
+      "avatar": "manga-1",
+      "passwordHash": "scrypt$16384$8$1$zjbV2ePJ6314033RtzbU2w$gjeWdw4jhvxLiXwMyzTkzo9YnOKUdtNGyMmNxfyA-YbHnZZNa2H-kTr68KaIINc3mScqo3U3F2IbciDH5P20FA",
+      "avatarImage": "ronja-1791555381212.jpeg",
+      "avatarMode": "preset"
     },
     {
       "id": "kathi",
       "username": "kathi",
-      "password": "1234",
       "displayName": "Kathi",
-      "avatar": "manga-2"
+      "avatar": "manga-2",
+      "passwordHash": "scrypt$16384$8$1$WanU8w0-eU0rJ9Z_Dq4PsQ$gx_m815tVR7m6tbV8tsRA1XwUMaErLKShFEK4gADoxqOeskc2sHviUQC9tbI5cs_7Z4q1JgAfxPfeNT0e4_Wtg"
     },
     {
       "id": "peci",
       "username": "peci",
-      "password": "super",
       "displayName": "Peci",
-      "avatar": "manga-3"
+      "avatar": "manga-6",
+      "passwordHash": "scrypt$16384$8$1$EEo_CmwdKHPn5eb9EMOu-w$MixB59FFXn5q7zriowSVP-V2f6WgOwd5ZF0jT_AX6US5Vl2gde4sPiIqrvdVcbyVEVpuCysDKjhNpTKcDvR2sQ",
+      "avatarMode": "photo",
+      "avatarImage": "peci-1791969456870.png"
     }
   ]
 }

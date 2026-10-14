@@ -99,7 +99,7 @@ export default function MangaFace({ mood = "happy", className = "" }: MangaFaceP
     <svg
       viewBox="0 0 220 230"
       role="img"
-      aria-label={mood === "happy" ? "Fröhliche Manga Figur" : mood === "sad" ? "Traurige Manga Figur" : "Manga Figur"}
+      aria-label={mood === "happy" ? "Fröhliche Comic Figur" : mood === "sad" ? "Traurige Comic Figur" : "Comic Figur"}
       className={`face ${motionClass} ${className}`}
     >
       {mood === "happy" || mood === "love" ? (

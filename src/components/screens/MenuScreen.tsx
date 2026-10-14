@@ -4,18 +4,28 @@ import { useRouter } from "next/navigation";
 import ComicButton from "@/components/ComicButton";
 import MangaFace from "@/components/MangaFace";
 import TopBar from "@/components/TopBar";
+import UserAvatar from "@/components/UserAvatar";
 
 interface MenuScreenProps {
   name: string;
+  avatarId: string | null;
+  avatarImage: string | null;
+  avatarMode: "preset" | "photo" | null;
 }
 
-export default function MenuScreen({ name }: MenuScreenProps) {
+export default function MenuScreen({ name, avatarId, avatarImage, avatarMode }: MenuScreenProps) {
   const router = useRouter();
 
   return (
     <main className="page">
       <div className="container">
         <TopBar showMenu={false}>
+          <UserAvatar
+            preset={avatarId}
+            image={avatarImage}
+            mode={avatarMode}
+            className="avatar--chip"
+          />
           <span className="chip chip--info">Hallo, {name}!</span>
         </TopBar>
 

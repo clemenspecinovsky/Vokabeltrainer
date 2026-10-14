@@ -26,3 +26,13 @@ export async function loadUsers(): Promise<StoredUser[]> {
   const data = await readJson<{ users: StoredUser[] }>("users.json");
   return Array.isArray(data?.users) ? data.users : [];
 }
+
+export async function saveUsers(users: StoredUser[]): Promise<void> {
+  const file = path.join(DATA_DIR, "users.json");
+  await fs.writeFile(file, `${JSON.stringify({ users }, null, 2)}\n`, "utf8");
+}
+
+export async function findUserById(id: string): Promise<StoredUser | null> {
+  const users = await loadUsers();
+  return users.find((entry) => entry.id === id) ?? null;
+}
