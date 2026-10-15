@@ -9,6 +9,33 @@ export interface VocabEntry {
 export type Direction = "de2en" | "en2de" | "mixed";
 export type SingleDirection = "de2en" | "en2de";
 
+export interface StoredDirectionProgress {
+  frontier: number;
+  knownAbove: string[];
+  unknownBelow: string[];
+}
+
+export interface StoredProgress {
+  en2de: StoredDirectionProgress;
+  de2en: StoredDirectionProgress;
+}
+
+export type ActivityType = "test" | "learn";
+
+export interface ActivityEntry {
+  type: ActivityType;
+  at: number;
+}
+
+export interface TestStats {
+  tests: number;
+  lastDay: string;
+  dayStreak: number;
+  todayCount: number;
+  sawSat: boolean;
+  sawSun: boolean;
+}
+
 export interface StoredUser {
   id: string;
   username: string;
@@ -18,6 +45,10 @@ export interface StoredUser {
   avatar?: string;
   avatarImage?: string;
   avatarMode?: "preset" | "photo";
+  progress?: StoredProgress;
+  history?: ActivityEntry[];
+  stats?: TestStats;
+  achievements?: string[];
 }
 
 export interface SessionData {

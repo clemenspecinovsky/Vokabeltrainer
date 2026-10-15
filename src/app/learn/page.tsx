@@ -1,8 +1,17 @@
-import { requireSession } from "@/lib/session";
+import { requireUser } from "@/lib/user";
 import { loadVocabulary } from "@/lib/vocabulary";
 import LearnScreen from "@/components/screens/LearnScreen";
 
 export default async function LearnPage() {
-  const [session, words] = await Promise.all([requireSession(), loadVocabulary()]);
-  return <LearnScreen name={session.name} words={words} />;
+  const [user, words] = await Promise.all([requireUser(), loadVocabulary()]);
+  return (
+    <LearnScreen
+      name={user.displayName}
+      words={words}
+      progress={user.progress ?? null}
+      avatarId={user.avatar ?? null}
+      avatarImage={user.avatarImage ?? null}
+      avatarMode={user.avatarMode ?? null}
+    />
+  );
 }

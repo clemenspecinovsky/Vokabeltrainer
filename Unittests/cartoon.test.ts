@@ -100,10 +100,14 @@ beforeAll(async () => {
 });
 
 beforeEach(() => {
-  vi.stubGlobal("setTimeout", (callback: (...args: unknown[]) => void) => {
-    queueMicrotask(() => callback());
-    return 0;
-  });
+  vi.stubGlobal(
+    "setTimeout",
+    (callback: (...args: unknown[]) => void, _delay?: number, ...args: unknown[]) => {
+      queueMicrotask(() => callback(...args));
+      return { unref: () => undefined, ref: () => undefined } as unknown as NodeJS.Timeout;
+    },
+  );
+  vi.stubGlobal("clearTimeout", (_id?: unknown) => undefined);
 });
 
 afterEach(() => {
@@ -375,6 +379,10 @@ describe("getCartoonResult (live)", () => {
   it.skipIf(!LIVE)(
     "replies with an image whose cut-out keeps an alpha channel",
     async () => {
+      // Real network access needs real timers: the suite-wide setTimeout stub
+      // makes undici's connect timer fire immediately, aborting every connect.
+      vi.unstubAllGlobals();
+
       const photo = await readFile(inputPath);
 
       const reply = await getCartoonResult(photo);

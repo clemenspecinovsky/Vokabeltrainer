@@ -1,17 +1,18 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import ComicButton from "@/components/ComicButton";
 import Confetti from "@/components/Confetti";
 import MangaFace from "@/components/MangaFace";
 import Progress from "@/components/Progress";
 import TopBar from "@/components/TopBar";
 import VoiceHint from "@/components/VoiceHint";
+import { getAchievement } from "@/lib/achievements";
 import { isCorrect } from "@/lib/answers";
 import { playClick, playCorrect, playFanfare, playFanfareSad, playWrong } from "@/lib/audio";
 import { numbersToWords } from "@/lib/numbers";
-import { randomInt, shuffle } from "@/lib/shuffle";
+import { WordProgress } from "@/lib/progress";
 import {
   canSpeak,
   listen,
@@ -22,12 +23,13 @@ import {
   type ListenHandle,
   type SpeechLang,
 } from "@/lib/speech";
-import type { Direction, SingleDirection, VocabEntry } from "@/lib/types";
+import type { Direction, SingleDirection, StoredProgress, VocabEntry } from "@/lib/types";
 
 interface Question {
   entry: VocabEntry;
   dir: SingleDirection;
   reask: boolean;
+  refresh: boolean;
 }
 
 interface Feedback {
@@ -48,13 +50,8 @@ const DIRECTIONS: { value: Direction; emoji: string; label: string; hint: string
 const COUNTS: { value: number; label: string }[] = [
   { value: 10, label: "10" },
   { value: 20, label: "20" },
-  { value: 0, label: "ALLE" },
+  { value: 30, label: "30" },
 ];
-
-function pickDirection(direction: Direction): SingleDirection {
-  if (direction === "mixed") return Math.random() < 0.5 ? "de2en" : "en2de";
-  return direction;
-}
 
 function sourceText(question: Question): string {
   return question.dir === "de2en" ? question.entry.de : question.entry.en;
@@ -75,14 +72,32 @@ function targetLang(question: Question): SpeechLang {
 interface TestScreenProps {
   name: string;
   words: VocabEntry[];
+  progress?: StoredProgress | null;
+  avatarId?: string | null;
+  avatarImage?: string | null;
+  avatarMode?: string | null;
 }
 
-export default function TestScreen({ name, words }: TestScreenProps) {
+export default function TestScreen({
+  name,
+  words,
+  progress,
+  avatarId = null,
+  avatarImage = null,
+  avatarMode = null,
+}: TestScreenProps) {
   const router = useRouter();
+  const topbarAvatar = {
+    avatarPreset: avatarId,
+    avatarImage,
+    avatarMode,
+  };
+  const model = useMemo(() => new WordProgress(words.map((word) => word.id), progress), [words, progress]);
+  const wordsById = useMemo(() => new Map(words.map((word) => [word.id, word])), [words]);
 
   const [phase, setPhase] = useState<Phase>("settings");
   const [settings, setSettings] = useState({
-    direction: "de2en" as Direction,
+    direction: "mixed" as Direction,
     count: 20,
     speakWord: true,
   });
@@ -101,11 +116,24 @@ export default function TestScreen({ name, words }: TestScreenProps) {
   const [voiceHint, setVoiceHint] = useState("");
   const [heard, setHeard] = useState<string | null>(null);
   const [celebrateKey, setCelebrateKey] = useState(0);
+  const [newly, setNewly] = useState<string[]>([]);
 
   const totalRef = useRef(0);
   const pendingRef = useRef<{ mastered: string[]; queue: Question[] } | null>(null);
   const advancedRef = useRef(false);
   const lockedRef = useRef(false);
+  const completedRef = useRef(false);
+  const startRef = useRef(0);
+  const statsRef = useRef({
+    wrongWords: new Set<string>(),
+    wrongEver: new Set<string>(),
+    streak: 0,
+    bestStreak: 0,
+    forgotThenLearned: false,
+    ponderedCorrect: false,
+    correct: 0,
+    wrong: 0,
+  });
   const timerRef = useRef<number | null>(null);
   const speechTimerRef = useRef<number | null>(null);
   const listenRef = useRef<ListenHandle | null>(null);
@@ -144,20 +172,35 @@ export default function TestScreen({ name, words }: TestScreenProps) {
       stopListening();
       stopSpeaking();
 
-      const pool = shuffle(words);
-      const selected = nextSettings.count > 0 ? pool.slice(0, nextSettings.count) : pool;
-      if (selected.length === 0) return;
-
-      const questions: Question[] = selected.map((entry) => ({
-        entry,
-        dir: pickDirection(nextSettings.direction),
-        reask: false,
-      }));
+      const plan = model.planTest({
+        direction: nextSettings.direction,
+        count: nextSettings.count,
+      });
+      const questions: Question[] = plan
+        .map((item) => {
+          const entry = wordsById.get(item.id);
+          if (!entry) return null;
+          return { entry, dir: item.direction, reask: false, refresh: item.refresh };
+        })
+        .filter((item): item is Question => item !== null);
+      if (questions.length === 0) return;
 
       totalRef.current = questions.length;
       pendingRef.current = null;
       advancedRef.current = false;
       lockedRef.current = false;
+      completedRef.current = false;
+      startRef.current = Date.now();
+      statsRef.current = {
+        wrongWords: new Set(),
+        wrongEver: new Set(),
+        streak: 0,
+        bestStreak: 0,
+        forgotThenLearned: false,
+        ponderedCorrect: false,
+        correct: 0,
+        wrong: 0,
+      };
 
       setTotal(questions.length);
       setQueue(questions.slice(1));
@@ -170,10 +213,11 @@ export default function TestScreen({ name, words }: TestScreenProps) {
       setFeedback(null);
       setVoiceHint("");
       setHeard(null);
+      setNewly([]);
       setPhase("running");
       setCelebrateKey((value) => value + 1);
     },
-    [settings, words, clearTimer, stopListening],
+    [settings, model, wordsById, clearTimer, stopListening],
   );
 
   const advance = useCallback(() => {
@@ -208,18 +252,54 @@ export default function TestScreen({ name, words }: TestScreenProps) {
 
   const scheduleReask = useCallback(
     (existing: Question[], question: Question): Question[] => {
+      const { position, direction } = model.planReask(existing.length, question.dir, {
+        direction: settings.direction === "mixed" ? undefined : settings.direction,
+      });
       const again: Question = {
         entry: question.entry,
-        dir: pickDirection(settings.direction),
+        dir: direction,
         reask: true,
+        refresh: false,
       };
       const copy = [...existing];
-      const insertAt = copy.length === 0 ? 0 : randomInt(1, Math.min(4, copy.length));
-      copy.splice(insertAt, 0, again);
+      copy.splice(position, 0, again);
       return copy;
     },
-    [settings.direction],
+    [model, settings.direction],
   );
+
+  const persistProgress = useCallback(() => {
+    void fetch("/api/progress", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ progress: model.toJSON() }),
+    }).catch(() => {});
+  }, [model]);
+
+  const completeTest = useCallback(() => {
+    const stats = statsRef.current;
+    const summary = {
+      correct: stats.correct,
+      wrong: stats.wrong,
+      wrongDistinct: stats.wrongWords.size,
+      bestStreakUnder3s: stats.bestStreak,
+      forgotThenLearned: stats.forgotThenLearned,
+      ponderedCorrect: stats.ponderedCorrect,
+    };
+    void fetch("/api/test-complete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ progress: model.toJSON(), summary }),
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { newly?: unknown } | null) => {
+        const ids = Array.isArray(data?.newly)
+          ? data.newly.filter((id): id is string => typeof id === "string")
+          : [];
+        if (ids.length > 0) setNewly(ids);
+      })
+      .catch(() => {});
+  }, [model]);
 
   const submit = useCallback(
     (raw: string) => {
@@ -230,19 +310,39 @@ export default function TestScreen({ name, words }: TestScreenProps) {
       lockedRef.current = true;
       stopListening();
 
+      const elapsed = Date.now() - startRef.current;
+      const stats = statsRef.current;
       const expected = targetText(current);
       const ok = isCorrect(given, expected, targetLang(current));
+
+      model.record(current.dir, current.entry.id, ok);
+      persistProgress();
 
       let nextMastered = mastered;
       let nextQueue = queue;
       let nextRetried = retried;
 
       if (ok) {
+        stats.correct += 1;
+        if (elapsed < 3000) {
+          stats.streak += 1;
+          stats.bestStreak = Math.max(stats.bestStreak, stats.streak);
+        } else {
+          stats.streak = 0;
+        }
+        if (elapsed > 60_000) stats.ponderedCorrect = true;
+        if (stats.wrongEver.has(current.entry.id)) stats.forgotThenLearned = true;
+
         if (!mastered.includes(current.entry.id)) nextMastered = [...mastered, current.entry.id];
         setCorrect((value) => value + 1);
         playCorrect();
         setCelebrateKey((value) => value + 1);
       } else {
+        stats.wrong += 1;
+        stats.streak = 0;
+        stats.wrongEver.add(current.entry.id);
+        stats.wrongWords.add(current.entry.id);
+
         setWrong((value) => value + 1);
         playWrong();
         nextQueue = scheduleReask(queue, current);
@@ -271,7 +371,7 @@ export default function TestScreen({ name, words }: TestScreenProps) {
       }
       if (ok) timerRef.current = window.setTimeout(advance, 1900);
     },
-    [current, feedback, mastered, queue, retried, scheduleReask, advance, clearTimer, stopListening],
+    [current, feedback, mastered, queue, retried, scheduleReask, advance, clearTimer, stopListening, model, persistProgress],
   );
 
   const toggleListening = useCallback(() => {
@@ -356,13 +456,19 @@ export default function TestScreen({ name, words }: TestScreenProps) {
   }, [phase, current, feedback]);
 
   useEffect(() => {
-    if (phase !== "done") return;
+    if (current) startRef.current = Date.now();
+  }, [current]);
+
+  useEffect(() => {
+    if (phase !== "done" || completedRef.current) return;
+    completedRef.current = true;
     stopSpeaking();
+    completeTest();
     const score = correct + wrong;
     if (score > 0 && correct / score >= 0.7) playFanfare();
     else playFanfareSad();
     setCelebrateKey((value) => value + 1);
-  }, [phase]);
+  }, [phase, correct, wrong, completeTest]);
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -373,7 +479,7 @@ export default function TestScreen({ name, words }: TestScreenProps) {
     return (
       <main className="page">
         <div className="container">
-          <TopBar />
+          <TopBar {...topbarAvatar} />
           <div className="panel">
             <p className="subtitle">Es gibt noch keine Vokabeln im Ordner data.</p>
           </div>
@@ -391,7 +497,7 @@ export default function TestScreen({ name, words }: TestScreenProps) {
     return (
       <main className="page">
         <div className="container" style={{ maxWidth: 860 }}>
-          <TopBar showMenu={false}>
+          <TopBar showMenu={false} {...topbarAvatar}>
             <span className="chip chip--info">👤 {name}</span>
           </TopBar>
 
@@ -422,13 +528,13 @@ export default function TestScreen({ name, words }: TestScreenProps) {
               </div>
 
               <h2 className="subtitle">2. Wie viele Wörter?</h2>
-              <div className="row">
+              <div className="row" style={{ width: "100%", flexWrap: "nowrap" }}>
                 {COUNTS.map((item) => (
                   <button
                     key={item.value}
                     type="button"
                     className="option"
-                    style={{ flex: "0 1 150px" }}
+                    style={{ flex: "1 1 0", minWidth: 0 }}
                     aria-pressed={settings.count === item.value}
                     onClick={() => {
                       playClick();
@@ -436,9 +542,7 @@ export default function TestScreen({ name, words }: TestScreenProps) {
                     }}
                   >
                     <span className="option__emoji">{item.label}</span>
-                    <span className="option__hint">
-                      {item.value === 0 ? `${words.length} Wörter` : "Wörter"}
-                    </span>
+                    <span className="option__hint">Wörter</span>
                   </button>
                 ))}
               </div>
@@ -470,7 +574,7 @@ export default function TestScreen({ name, words }: TestScreenProps) {
                 TEST STARTEN ▶
               </ComicButton>
               <p className="hint">
-                Richtung: {directionInfo.label} · {settings.count === 0 ? words.length : settings.count} Wörter
+                Richtung: {directionInfo.label} · {Math.min(settings.count, words.length)} Wörter
                 {recognitionStatus().ok ? " · 🎤 Antwort auch sprechen möglich" : " · 🎤 nicht verfügbar"}
               </p>
               <VoiceHint />
@@ -488,7 +592,7 @@ export default function TestScreen({ name, words }: TestScreenProps) {
         <div className="container" style={{ maxWidth: 820 }}>
           <Confetti key={`done-${celebrateKey}`} count={40} />
 
-          <TopBar>
+          <TopBar {...topbarAvatar}>
             <span className="chip chip--info">👤 {name}</span>
           </TopBar>
 
@@ -524,6 +628,23 @@ export default function TestScreen({ name, words }: TestScreenProps) {
               ) : (
                 <p className="hint">Kein einziges Wort musste wiederholt werden. Perfekt!</p>
               )}
+
+              {newly.length > 0 ? (
+                <div className="stack" style={{ gap: "0.5rem", width: "100%" }}>
+                  <h3 className="subtitle">🎉 Neue Erfolge freigeschaltet!</h3>
+                  <div className="row">
+                    {newly.map((id) => {
+                      const achievement = getAchievement(id);
+                      if (!achievement) return null;
+                      return (
+                        <span key={id} className="chip chip--correct" title={achievement.description}>
+                          {achievement.emoji} {achievement.title}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null}
             </div>
           </section>
 
@@ -548,7 +669,7 @@ export default function TestScreen({ name, words }: TestScreenProps) {
   return (
     <main className="page page--quiz">
       <div className="container" style={{ maxWidth: 860 }}>
-        <TopBar>
+        <TopBar {...topbarAvatar}>
           <span className="chip chip--info">👤 {name}</span>
           <span className="chip chip--correct">✅ {correct}</span>
           <span className="chip chip--wrong">❌ {wrong}</span>
@@ -572,6 +693,7 @@ export default function TestScreen({ name, words }: TestScreenProps) {
                   {question.dir === "de2en" ? "🇩🇪 DEUTSCH → 🇬🇧 ENGLISCH" : "🇬🇧 ENGLISCH → 🇩🇪 DEUTSCH"}
                 </span>
                 {question.reask ? <span className="chip chip--wrong">🔁 NOCHMAL</span> : null}
+                {question.refresh ? <span className="chip chip--info">🔁 WIEDERHOLUNG</span> : null}
               </div>
 
               <p className="word">{sourceText(question)}</p>

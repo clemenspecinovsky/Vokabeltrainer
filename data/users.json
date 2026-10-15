@@ -7,14 +7,81 @@
       "avatar": "manga-1",
       "passwordHash": "scrypt$16384$8$1$zjbV2ePJ6314033RtzbU2w$gjeWdw4jhvxLiXwMyzTkzo9YnOKUdtNGyMmNxfyA-YbHnZZNa2H-kTr68KaIINc3mScqo3U3F2IbciDH5P20FA",
       "avatarImage": "ronja-1791555381212.jpeg",
-      "avatarMode": "preset"
+      "avatarMode": "preset",
+      "progress": {
+        "en2de": {
+          "frontier": 6,
+          "knownAbove": [],
+          "unknownBelow": [
+            "w0",
+            "w1",
+            "w2"
+          ]
+        },
+        "de2en": {
+          "frontier": 1,
+          "knownAbove": [
+            "w7",
+            "w8",
+            "w10",
+            "w15"
+          ],
+          "unknownBelow": []
+        }
+      },
+      "achievements": []
     },
     {
       "id": "kathi",
       "username": "kathi",
       "displayName": "Kathi",
       "avatar": "manga-2",
-      "passwordHash": "scrypt$16384$8$1$WanU8w0-eU0rJ9Z_Dq4PsQ$gx_m815tVR7m6tbV8tsRA1XwUMaErLKShFEK4gADoxqOeskc2sHviUQC9tbI5cs_7Z4q1JgAfxPfeNT0e4_Wtg"
+      "passwordHash": "scrypt$16384$8$1$WanU8w0-eU0rJ9Z_Dq4PsQ$gx_m815tVR7m6tbV8tsRA1XwUMaErLKShFEK4gADoxqOeskc2sHviUQC9tbI5cs_7Z4q1JgAfxPfeNT0e4_Wtg",
+      "progress": {
+        "en2de": {
+          "frontier": 20,
+          "knownAbove": [],
+          "unknownBelow": [
+            "w0",
+            "w4",
+            "w6",
+            "w9",
+            "w10",
+            "w12",
+            "w17"
+          ]
+        },
+        "de2en": {
+          "frontier": 1,
+          "knownAbove": [
+            "w4",
+            "w6",
+            "w9",
+            "w10",
+            "w12",
+            "w17"
+          ],
+          "unknownBelow": []
+        }
+      },
+      "achievements": [
+        "deja-wort",
+        "first-test"
+      ],
+      "stats": {
+        "tests": 1,
+        "lastDay": "2026-10-15",
+        "dayStreak": 1,
+        "todayCount": 1,
+        "sawSat": false,
+        "sawSun": false
+      },
+      "history": [
+        {
+          "type": "test",
+          "at": 1792070786734
+        }
+      ]
     },
     {
       "id": "peci",
@@ -23,7 +90,48 @@
       "avatar": "manga-6",
       "passwordHash": "scrypt$16384$8$1$EEo_CmwdKHPn5eb9EMOu-w$MixB59FFXn5q7zriowSVP-V2f6WgOwd5ZF0jT_AX6US5Vl2gde4sPiIqrvdVcbyVEVpuCysDKjhNpTKcDvR2sQ",
       "avatarMode": "photo",
-      "avatarImage": "peci-1791969456870.png"
+      "avatarImage": "peci-1791969456870.png",
+      "progress": {
+        "en2de": {
+          "frontier": 20,
+          "knownAbove": [],
+          "unknownBelow": [
+            "w5",
+            "w6",
+            "w7",
+            "w8",
+            "w18"
+          ]
+        },
+        "de2en": {
+          "frontier": 14,
+          "knownAbove": [
+            "w18"
+          ],
+          "unknownBelow": [
+            "w4"
+          ]
+        }
+      },
+      "achievements": [
+        "avatar",
+        "no-mistakes",
+        "first-test"
+      ],
+      "stats": {
+        "tests": 1,
+        "lastDay": "2026-10-15",
+        "dayStreak": 1,
+        "todayCount": 1,
+        "sawSat": false,
+        "sawSun": false
+      },
+      "history": [
+        {
+          "type": "test",
+          "at": 1792061282573
+        }
+      ]
     }
   ]
 }

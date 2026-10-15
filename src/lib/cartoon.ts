@@ -6,6 +6,7 @@ import {
   randomBytes,
 } from "node:crypto";
 import sharp from "sharp";
+import { Agent, setGlobalDispatcher } from "undici";
 
 export const CARTOON_PROMPT =
     "Please make a cute minimalistic but still colored comic style avatar out " +
@@ -24,6 +25,22 @@ const SELECTED_MODEL = "flux_klein/edit";
 const MAX_DIMENSION = 1248;
 const POLL_INTERVAL_MS = 5_000;
 const MAX_POLL_ATTEMPTS = 40;
+
+// Node's built-in fetch (undici) caps the TCP/TLS connect phase at a
+// hard-coded 10s, which is too short for slow connections to the cartoon API
+// (the connect can take ~10s+). Raise it via a global dispatcher.
+const CONNECT_TIMEOUT_MS = Number(
+    process.env.CARTOON_CONNECT_TIMEOUT_MS ?? 60_000,
+);
+
+let dispatcherInstalled = false;
+
+function ensureConnectTimeout(): void {
+  if (dispatcherInstalled) return;
+  dispatcherInstalled = true;
+  setGlobalDispatcher(new Agent({ connect: { timeout: CONNECT_TIMEOUT_MS } }));
+}
+
 
 interface UploadParams {
   positive_prompts: string;
@@ -344,6 +361,8 @@ export async function getCartoonResult(
   if (!Buffer.isBuffer(imageBytes) || imageBytes.length === 0) {
     throw new TypeError("imageBytes must be a non-empty Buffer");
   }
+
+  ensureConnectTimeout();
 
   const code = await uploadImage(imageBytes);
   const resultUrl = await pollForResult(code);

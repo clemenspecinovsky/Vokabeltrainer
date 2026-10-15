@@ -1,27 +1,63 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ComicButton from "@/components/ComicButton";
 import Progress from "@/components/Progress";
 import TopBar from "@/components/TopBar";
 import VoiceHint from "@/components/VoiceHint";
 import { playClick } from "@/lib/audio";
+import { WordProgress } from "@/lib/progress";
 import { canSpeak, speak } from "@/lib/speech";
-import type { VocabEntry } from "@/lib/types";
+import type { StoredProgress, VocabEntry } from "@/lib/types";
 
 interface LearnScreenProps {
   name: string;
   words: VocabEntry[];
+  progress?: StoredProgress | null;
+  avatarId?: string | null;
+  avatarImage?: string | null;
+  avatarMode?: string | null;
 }
 
-export default function LearnScreen({ name, words }: LearnScreenProps) {
+export default function LearnScreen({
+  name,
+  words,
+  progress,
+  avatarId = null,
+  avatarImage = null,
+  avatarMode = null,
+}: LearnScreenProps) {
   const router = useRouter();
-  const [index, setIndex] = useState(0);
+  const topbarAvatar = {
+    avatarPreset: avatarId,
+    avatarImage,
+    avatarMode,
+  };
+  const model = useMemo(() => new WordProgress(words.map((word) => word.id), progress), [words, progress]);
+  const startIndex = useMemo(() => {
+    const id = model.firstUnknownId();
+    if (!id) return 0;
+    const found = words.findIndex((entry) => entry.id === id);
+    return found < 0 ? 0 : found;
+  }, [model, words]);
+  const [index, setIndex] = useState(startIndex);
   const [confirming, setConfirming] = useState(false);
+  const loggedRef = useRef(false);
+
+  useEffect(() => {
+    if (loggedRef.current) return;
+    loggedRef.current = true;
+    void fetch("/api/activity", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "learn" }),
+    }).catch(() => {});
+  }, []);
 
   const total = words.length;
   const word = words[index];
+  const status = word ? model.status(word.id) : null;
 
   const goNext = useCallback(() => {
     playClick();
@@ -51,7 +87,7 @@ export default function LearnScreen({ name, words }: LearnScreenProps) {
     return (
       <main className="page">
         <div className="container">
-          <TopBar />
+          <TopBar {...topbarAvatar} />
           <div className="panel">
             <p className="subtitle">Es gibt noch keine Vokabeln.</p>
           </div>
@@ -63,7 +99,7 @@ export default function LearnScreen({ name, words }: LearnScreenProps) {
   return (
     <main className="page">
       <div className="container">
-        <TopBar>
+        <TopBar {...topbarAvatar}>
           <span className="chip chip--info">👤 {name}</span>
           <span className="chip">Wort {index + 1} / {total}</span>
         </TopBar>
@@ -79,6 +115,21 @@ export default function LearnScreen({ name, words }: LearnScreenProps) {
         <section key={index} className="panel card-enter" aria-live="polite">
           <div className="stack">
             <span className="chip chip--info">🇩🇪 DEUTSCH</span>
+
+            {status ? (
+              <div className="row" aria-label="Lernstand dieser Vokabel">
+                <span className={status.de2en ? "chip chip--correct" : "chip"}>
+                  DE→EN {status.de2en ? "✓ bekannt" : "○ offen"}
+                </span>
+                <span className={status.en2de ? "chip chip--correct" : "chip"}>
+                  EN→DE {status.en2de ? "✓ bekannt" : "○ offen"}
+                </span>
+                {!status.de2en && !status.en2de ? (
+                  <span className="chip chip--info">noch nicht getestet</span>
+                ) : null}
+              </div>
+            ) : null}
+
             <p className="word">{word.de}</p>
             <ComicButton
               tone="cyan"
